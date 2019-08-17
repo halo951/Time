@@ -44,31 +44,32 @@ export default class Time {
   static countDown(time: number) {
     // 检查并更新时间格式为毫秒格式
     time = this.getTimestamp(time);
-
-    if (time < 0) {
+    // 获取剩余时长
+    let cd = time - new Date().getTime();
+    if (cd < 0) {
       return "00:00:00";
-    } else if (time >= 24 * 60 * 60 * 1000) {
+    } else if (cd >= 24 * 60 * 60 * 1000) {
       // 超过一天的折合成一天
-      let day = Math.floor(time / 24 / 60 / 60 / 1000);
+      let day = Math.floor(cd / 24 / 60 / 60 / 1000);
       if (day > 9999) return "永久";
       else return `${day}天`;
     }
-    let tts_Day = Math.floor(time / (3600000 * 24));
-    time = time - tts_Day * 3600000 * 24;
-    let tts_Hour = Math.floor(time / 3600000);
-    time = time - tts_Hour * 3600000;
-    let tts_Minute = Math.floor(time / 60000);
-    time = time - tts_Minute * 60000;
-    let tts_Second = Math.floor(time / 1000);
+    let day = Math.floor(cd / (1000 * 60 * 60 * 24));
+    cd = cd - (day * (10 * 60 * 60 * 24));
+    let hour = Math.floor(cd / (1000 * 60 * 60));
+    cd = cd - (hour * (1000 * 60 * 60));
+    let minute = Math.floor(cd / (1000 * 60));
+    cd = cd - (minute * (1000 * 60));
+    let second = Math.floor(cd / 1000);
     let r = "";
-    if (tts_Day > 0) {
-      r += tts_Day + "-";
+    if (day > 0) {
+      r += day + "天";
     }
-    r += tts_Hour >= 10 ? tts_Hour : "0" + tts_Hour;
+    r += hour >= 10 ? hour : "0" + hour;
     r += ":";
-    r += tts_Minute >= 10 ? tts_Minute : "0" + tts_Minute;
+    r += minute >= 10 ? minute : "0" + minute;
     r += ":";
-    r += tts_Second >= 10 ? tts_Second : "0" + tts_Second;
+    r += second >= 10 ? second : "0" + second;
     return r;
   }
   /**
@@ -175,7 +176,7 @@ export default class Time {
     let r = format;
     Object.keys(timeConvertFormula).forEach(key => {
       if (new RegExp(key, "g").test(r)) {
-        r.replace(new RegExp(key, "g"), timeConvertFormula[key](date));
+        r = r.replace(new RegExp(key, "g"), timeConvertFormula[key](date));
       }
     });
     return r;
